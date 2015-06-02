@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:background="@color/shorw_card_huise"
+    >
+	<include 
+	    layout="@layout/top_view"
+	    />
+    
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dip" 
+        android:orientation="horizontal"
+        android:layout_marginTop="10dip"
+        android:layout_marginLeft="40dip"
+        android:layout_marginRight="40dip"
+        android:focusable="true"   
+		android:focusableInTouchMode="true"
+        >
+		<TextView 
+		    android:layout_width="wrap_content"
+		    android:layout_height="50dip"
+		    
+		    android:text="卡 号:"
+		    android:textSize="20sp"
+		    android:textColor="@color/shorw_card_baise"
+		   
+		    android:gravity="center"
+		    android:layout_weight="0.5"
+		    />
+	
+		     <EditText
+            android:id="@+id/card_search_card"
+            android:layout_width="wrap_content"
+            android:layout_height="40dip"
+            android:hint="输入8位卡号"
+            android:textSize="20sp" 
+            android:maxLines="8"
+            android:numeric="integer"
+            android:maxLength="8"
+            android:textColor="@color/shorw_card_huise"
+            android:paddingLeft="10dip"
+            android:background="@drawable/edit_text"
+             android:layout_weight="1"
+            />
+
+		   <Button
+		       android:id="@+id/card_card_btn"
+		       android:layout_width="60dip"
+		       android:layout_height="40dip"
+		       android:layout_marginLeft="5dip"
+		       android:layout_marginRight="8dip"
+		       android:background="@drawable/btn_backg"
+		       android:textColor="@color/shorw_card_baise"
+		       android:textSize="18sp"
+		        android:layout_weight="0.5"
+		       android:text="搜  索" />
+		   
+	
+
+	</LinearLayout> 
+	
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dip" 
+        android:orientation="horizontal"
+        android:layout_marginTop="10dip"
+        android:layout_marginLeft="40dip"
+        android:layout_marginRight="40dip"
+        android:focusable="true"   
+		android:focusableInTouchMode="true"
+        >
+		<TextView 
+		   android:layout_width="wrap_content"
+		    android:layout_height="50dip"
+		    android:text="RSSI:"
+		    android:textSize="20sp"
+		    android:textColor="@color/shorw_card_baise"
+		    android:gravity="center"
+		    android:layout_weight="0.5"
+		    
+		    />
+
+		     <EditText
+            android:id="@+id/card_search_rssi"
+            android:layout_width="wrap_content"
+            android:layout_height="40dip"
+            android:hint="过滤掉＜值 "
+            android:textSize="20sp" 
+            android:maxLines="8"
+            android:maxLength="8"
+             android:numeric="integer"
+            android:textColor="@color/shorw_card_huise"
+            android:paddingLeft="10dip"
+            android:background="@drawable/edit_text"
+            android:layout_marginLeft="5dip"
+            android:layout_weight="1"
+            />
+		    <Button
+		        android:id="@+id/card_rssi_btn"
+		       android:layout_width="60dip"
+		       android:layout_height="40dip"
+		           android:layout_marginLeft="5dip"
+		       android:layout_marginRight="8dip"
+		       android:background="@drawable/btn_backg"
+		       android:textSize="18sp"
+		       android:textColor="@color/shorw_card_baise"
+		       android:text="过  滤" 
+		       android:layout_weight="0.5"
+		       />
+
+	</LinearLayout> 
+	
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dip" 
+        android:orientation="horizontal"
+        android:layout_marginTop="10dip"
+        android:layout_marginLeft="40dip"
+        android:layout_marginRight="40dip"
+        android:gravity="center_horizontal"
+        >
+
+		<Button
+		    android:id="@+id/card_info_btn_clear"
+		    android:layout_width="110dip"
+		    android:layout_height="40dip"
+		    android:layout_marginRight="25dip"
+		    android:background="@drawable/btn_backg"
+		    android:text="清  空"
+		    android:textColor="@color/shorw_card_baise"
+		    android:textSize="18sp" />
+
+		<Button
+		    android:id="@+id/show_card_mode"
+		    android:layout_width="110dip"
+		    android:layout_height="40dip"
+		    android:background="@drawable/btn_backg"
+		    android:text="滚动模式"
+		      android:layout_marginLeft="25dip"
+		    android:textColor="@color/shorw_card_baise"
+		    android:textSize="18sp" />
+
+	</LinearLayout> 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" 
+        android:orientation="horizontal"
+        android:layout_marginTop="10dip"
+        android:layout_marginLeft="40dip"
+        android:layout_marginRight="40dip"
+        android:layout_marginBottom="50dip"
+        android:background="@drawable/button_circular"
+        >
+		<RelativeLayout 
+		     android:layout_width="match_parent"
+		     android:layout_height="match_parent"
+		    >
+		    <ListView
+		        android:id="@+id/card_listview"
+		        android:layout_width="match_parent"
+		        android:layout_height="match_parent"
+		       	android:layout_margin="3dip"
+		       	android:divider="#20ffffff"
+				android:dividerHeight="1px"
+				android:visibility="gone"
+		        />
+		    <ImageView
+		        android:id="@+id/card_img_info"
+		        android:layout_width="200dip"
+		        android:layout_height="200dip"
+		        android:layout_centerHorizontal="true"
+		        android:layout_centerVertical="true"
+		        android:src="@drawable/card_peidui"
+		        />
+		</RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

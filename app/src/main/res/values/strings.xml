@@ -1,0 +1,17 @@
+<resources>
+
+        <string name="app_name">蓝牙读写器</string>
+    <string name="search_card">search</string>
+    <string name="search_rssi"> 过滤  </string>
+    
+    
+     <!-- 搜索界面 -->
+    <string name="noNewDevice">no new device</string>
+    <string name="noPairedDevice">no paired device</string>
+    <string name="scanning">Searching...</string>
+    <string name="select_device">Choose device to connect</string>
+    <string name="pairedDevice">Paired devices</string>
+    <string name="newDevice">New devices</string>
+    <string name="scanNew">Search news</string>
+
+</resources>

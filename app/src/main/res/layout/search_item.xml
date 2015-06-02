@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:layout_marginLeft="10dip"
+	
+    >
+    
+    <TextView 
+        android:id="@+id/search_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+       android:textColor="@color/shorw_card_baise"
+        android:textSize="25sp"
+        android:text="不要连我"
+        android:layout_marginLeft="10dip"
+        />
+	<TextView 
+	     android:id="@+id/search_item_addr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/shorw_card_baise"
+        android:textSize="18sp"
+        android:text="不要连我"
+        android:layout_marginLeft="14dip"
+	    />
+</LinearLayout>

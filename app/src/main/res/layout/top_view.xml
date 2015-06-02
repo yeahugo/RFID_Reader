@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="50dip"
+    android:orientation="horizontal" 
+    android:background="#3f51b5"
+    >
+    
+    <Button 
+        android:id="@+id/top_btn"
+        android:layout_width="70dip"
+        android:layout_height="40dip"
+        android:text="退出"
+        android:textColor="@color/shorw_card_baise"
+        android:background="@drawable/button_circular"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="20dip"
+        
+        />
+	<TextView 
+	    android:id="@+id/top_tv"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="蓝牙"
+	    android:textSize="25dip"
+	    android:textColor="@color/shorw_card_baise"
+	    
+	    android:layout_centerHorizontal="true"
+	    android:layout_centerVertical="true"
+	    />
+</RelativeLayout>
