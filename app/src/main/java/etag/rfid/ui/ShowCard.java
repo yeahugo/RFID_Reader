@@ -1,5 +1,6 @@
 package etag.rfid.ui;
 
+import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -11,6 +12,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.android.volley.Request.Method;
 
 import com.etag.R;
 
@@ -110,6 +119,9 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
 	private int FilterRssi = 0;//RSSI过滤标记
 	private boolean isLookCard = false;//是否加卡模式还是普通模式
     int filterCount= 0;
+
+    private RequestQueue mRequestQueue;
+    private StringRequest mStringRequest;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -225,10 +237,25 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
         return result;
     }
 
-	@SuppressLint("ShowToast")
-	private void updateListView(String rfid,int rssi,String time,int pwd,int wn,int wrssi){
-		boolean b=false;
+    private void postCardsData(List<HashMap<Integer,HashMap<String,CCardInfo>>> sendCardList)
+    {
+        String url = "";
+        mRequestQueue = Volley.newRequestQueue(this);
+        mStringRequest = new StringRequest(Request.Method.POST,url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                Log.v("response",s);
+            }
+        }, new Response.ErrorListener(){
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Log.v("error is ",volleyError.toString());
+            }
+        });
+    }
 
+    private void updateCardsList(String rfid,int rssi,String time,int pwd,int wn,int wrssi)
+    {
         DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
         Integer timeInteger = 0;
         try {
@@ -250,7 +277,6 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
             cardMap.put(rfid,card);
 
             if (firstCards.keySet().size() == 0){
-
                 firstCards.put(timeInteger,cardMap);
             } else if (secondCards.keySet().size() == 0) {
                 secondCards.put(timeInteger,cardMap);
@@ -277,8 +303,16 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
 
         if (sendCardLists.size() > MaxSentListSize){
             List<HashMap<Integer,HashMap<String,CCardInfo>>> tempSendList = new ArrayList(sendCardLists);
+            postCardsData(tempSendList);
             sendCardLists.clear();
         }
+    }
+
+	@SuppressLint("ShowToast")
+	private void updateListView(String rfid,int rssi,String time,int pwd,int wn,int wrssi){
+		boolean b=false;
+
+        updateCardsList(rfid,rssi,time,pwd,wn,wrssi);
 
         Log.i("sendCards is ",sendCards.toString());
 
