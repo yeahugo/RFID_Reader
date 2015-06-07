@@ -8,18 +8,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.android.volley.Request.Method;
+import com.android.volley.Request;
 
 import com.etag.R;
 
@@ -70,7 +70,7 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
     private double latitude = 0.0;
     private double longitude = 0.0;
 
-    private  static final int MaxSentListSize = 10;
+    private  static final int MaxSentListSize = 3;
 
     // Debugging
     private static final String TAG = "BluetoothComm";
@@ -237,9 +237,9 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
         return result;
     }
 
-    private void postCardsData(List<HashMap<Integer,HashMap<String,CCardInfo>>> sendCardList)
+    private void postCardsData(final List<HashMap<Integer,HashMap<String,CCardInfo>>> sendCardList)
     {
-        String url = "";
+        String url = "http://120.24.173.189:9000";
         mRequestQueue = Volley.newRequestQueue(this);
         mStringRequest = new StringRequest(Request.Method.POST,url,new Response.Listener<String>() {
             @Override
@@ -251,7 +251,40 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
             public void onErrorResponse(VolleyError volleyError) {
                 Log.v("error is ",volleyError.toString());
             }
-        });
+        }){
+            protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
+                String oneTimeData = "[";
+                Log.i("sendCardLists is ",sendCardList.toString());
+                for (HashMap<Integer,HashMap<String,CCardInfo>> sendCard:sendCardList){
+                    Log.i("sendCard is ",sendCard.toString());
+                    Integer key = (Integer)sendCard.keySet().toArray()[0];
+                    oneTimeData = oneTimeData + "[" +key+","+"31.32"+","+"117.23"
+                    +",";
+                    HashMap<String,CCardInfo> hashMap = sendCard.get(key);
+
+                    String rfidString = "[";
+                    for (Iterator i = hashMap.keySet().iterator();i.hasNext();){
+                        String rfid = (String)i.next();
+                        CCardInfo cardInfo = (CCardInfo)hashMap.get(rfid);
+                        String rssi = String.valueOf(cardInfo.getRssi());
+                        String oneRfid = "[" + rfid + "," + rssi + "]";
+                        rfidString = rfidString + oneRfid;
+                        if (i.hasNext()){
+                             rfidString = rfidString + ",";
+                        }
+                    }
+                    oneTimeData = oneTimeData + rfidString + "]],";
+                    Log.v("rfidString --",rfidString);
+                }
+                oneTimeData = oneTimeData + "]";
+                Log.v("----sendData is ",oneTimeData);
+
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("data", oneTimeData);
+                return params;
+            };
+        };
+        mRequestQueue.add(mStringRequest);
     }
 
     private void updateCardsList(String rfid,int rssi,String time,int pwd,int wn,int wrssi)
@@ -295,14 +328,19 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
                         sendCards = firstCards;
                     }
                     secondCards.clear();
-                    firstCards.put(timeInteger,cardMap);
+                    secondCards.put(timeInteger,cardMap);
                 }
                 sendCardLists.add(sendCards);
             }
         }
 
+
         if (sendCardLists.size() > MaxSentListSize){
-            List<HashMap<Integer,HashMap<String,CCardInfo>>> tempSendList = new ArrayList(sendCardLists);
+            Log.i("send Card list is ",sendCardLists.toString());
+
+            List<HashMap<Integer,HashMap<String,CCardInfo>>> tempSendList = new ArrayList<HashMap<Integer,HashMap<String,CCardInfo>>>();
+            tempSendList.addAll(sendCardLists);
+            Log.v("size is ",String.valueOf(tempSendList.size()));
             postCardsData(tempSendList);
             sendCardLists.clear();
         }
@@ -314,7 +352,7 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
 
         updateCardsList(rfid,rssi,time,pwd,wn,wrssi);
 
-        Log.i("sendCards is ",sendCards.toString());
+//        Log.i("sendCards is ",sendCards.toString());
 
 //		Log.i("kkk", ">>>>>>>>"+rfid+"------"+""+rssi+"------"+time);
 		//Log.i("ReadCardsActivity", targetId);
@@ -367,8 +405,8 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
 
 					lsitCardInfo.add(CardInfo(rfid, rssi, time, pwd, wn, wrssi));
 				}
-                Log.v("find new card ",rfid);
-                Log.v("lsitCardInfo is ",lsitCardInfo.toString());
+//                Log.v("find new card ",rfid);
+//                Log.v("lsitCardInfo is ",lsitCardInfo.toString());
 			}
 		}
 		if(FilterFlag == 1){
