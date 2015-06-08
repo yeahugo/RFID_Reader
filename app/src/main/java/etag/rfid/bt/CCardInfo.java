@@ -35,7 +35,8 @@ public class CCardInfo {
 	private int cnt=0;
 	private int listCount = -1;
 	private int XYZ = -1;
-	
+	private int mCount = 1;
+
 	public int getXYZ() {
 		//0 x:4 y:2 z:1 xy:6 xz5 yz:3 xyz:7
 		setXYZ(mBattery);
@@ -150,6 +151,17 @@ public class CCardInfo {
 	{
 		return mRfid;
 	}
+
+    public void setCount(Integer count){ this.mCount = count;}
+
+    public void increaseCount(){
+        this.mCount = mCount++;
+    }
+
+    public Integer getCount(){
+        return mCount;
+    }
+
 	public int getRssi(boolean t){
 		return mRssi;
 	}
