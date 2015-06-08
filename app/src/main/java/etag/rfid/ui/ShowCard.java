@@ -228,7 +228,7 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
             return result;
         } else {
             for (String s:firstCardMap.keySet()){
-                if (!secondCards.containsKey(s)){
+                if (!secondCardMap.containsKey(s)){
                     result = false;
                     return result;
                 }
@@ -254,9 +254,10 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
         }){
             protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
                 String oneTimeData = "[";
-                Log.i("sendCardLists is ",sendCardList.toString());
-                for (HashMap<Integer,HashMap<String,CCardInfo>> sendCard:sendCardList){
-                    Log.i("sendCard is ",sendCard.toString());
+//                Log.i("sendCardLists is ",sendCardList.toString());
+                for (Iterator iterator = sendCardList.iterator();iterator.hasNext();){
+//                    Log.i("sendCard is ",sendCard.toString());
+                    HashMap<Integer,HashMap<String,CCardInfo>> sendCard = (HashMap<Integer,HashMap<String,CCardInfo>>)iterator.next();
                     Integer key = (Integer)sendCard.keySet().toArray()[0];
                     oneTimeData = oneTimeData + "[" +key+","+"31.32"+","+"117.23"
                     +",";
@@ -273,8 +274,13 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
                              rfidString = rfidString + ",";
                         }
                     }
-                    oneTimeData = oneTimeData + rfidString + "]],";
-                    Log.v("rfidString --",rfidString);
+                    oneTimeData = oneTimeData + rfidString + "]]";
+
+                    if(iterator.hasNext()){
+                        oneTimeData = oneTimeData + ",";
+                    }
+
+//                    Log.v("rfidString --",rfidString);
                 }
                 oneTimeData = oneTimeData + "]";
                 Log.v("----sendData is ",oneTimeData);
@@ -287,6 +293,7 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
         mRequestQueue.add(mStringRequest);
     }
 
+    //简单找出和上一秒不同的时刻，并把这一秒数据发送到服务端
     private void updateCardsList(String rfid,int rssi,String time,int pwd,int wn,int wrssi)
     {
         DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
@@ -319,12 +326,16 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
 
                 if (firstKey <= secondKey){
                     if (!isCardsEqual(firstCards,secondCards)){
+//                        Log.v("firstCards is ",firstCards.toString());
+//                        Log.v("secondCards is ",sendCards.toString());
                         sendCards = secondCards;
                     }
                     firstCards.clear();
                     firstCards.put(timeInteger,cardMap);
                 } else {
                     if (!isCardsEqual(firstCards,secondCards)){
+//                        Log.v("firstCards is ",firstCards.toString());
+//                        Log.v("secondCards is ",sendCards.toString());
                         sendCards = firstCards;
                     }
                     secondCards.clear();
@@ -336,11 +347,10 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
 
 
         if (sendCardLists.size() > MaxSentListSize){
-            Log.i("send Card list is ",sendCardLists.toString());
+//            Log.i("send Card list is ",sendCardLists.toString());
 
             List<HashMap<Integer,HashMap<String,CCardInfo>>> tempSendList = new ArrayList<HashMap<Integer,HashMap<String,CCardInfo>>>();
             tempSendList.addAll(sendCardLists);
-            Log.v("size is ",String.valueOf(tempSendList.size()));
             postCardsData(tempSendList);
             sendCardLists.clear();
         }
