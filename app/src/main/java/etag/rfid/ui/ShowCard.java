@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.android.volley.Request;
@@ -52,7 +53,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-/**   
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+
+/**
  * 
  *@ Simple To Introduction
  *@ 项目名称:  [蓝牙读写器]
@@ -74,7 +83,7 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
     private double longitude = 0.0;
 
     private static final int MaxSentListSize = 5;
-    private static final int TimeInterval = 5;
+    private static final int TimeInterval = 2;
 
     // Debugging
     private static final String TAG = "BluetoothComm";
@@ -125,14 +134,46 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
     private RequestQueue mRequestQueue;
     private StringRequest mStringRequest;
 
+    public LocationClient mLocationClient = null;
+
+    private double latitude;
+    private double longitude;
+
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.show_card);
+        mRequestQueue = Volley.newRequestQueue(this);
 
 		bluetooth = AfdBT.GetAdapter();
 		device = bluetooth.getRemoteDevice(AfdBT.getAddress());
+
+        mLocationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
+        mLocationClient.registerLocationListener( myListener );    //注册监听函数
+
+        // 设置定位条件
+        LocationClientOption option = new LocationClientOption();
+        option.setOpenGps(true); // 是否打开GPS
+        option.setCoorType("bd09ll"); // 设置返回值的坐标类型。
+
+        // 设置产品线名称。强烈建议您使用自定义的产品线名称，方便我们以后为您提供更高效准确的定位服务。
+        // option.setScanSpan(UPDATE_TIME);// 设置定时定位的时间间隔。单位毫秒
+        mLocationClient.setLocOption(option);
+
+        // 注册位置监听器
+        mLocationClient.registerLocationListener(new BDLocationListener() {
+
+            @Override
+            public void onReceiveLocation(BDLocation location) {
+                // TODO Auto-generated method stub
+                if (location == null) {
+                    return;
+                }
+
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+        }});
 
 		mhandler=new Handler() {
 			boolean t = false;
@@ -216,34 +257,18 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
 	        if(D) Log.e(TAG, "--- ON DESTROY ---");
 	}
 
-    private boolean isCardsEqual(HashMap<Integer,HashMap<String,CCardInfo>> firstCards,HashMap<Integer,HashMap<String,CCardInfo>> secondCards){
-        boolean result = true;
-
-        if (firstCards == null && secondCards == null){
-            return true;
-        }
-
-        HashMap<String,CCardInfo> firstCardMap = firstCards.get(firstCards.keySet().toArray()[0]);
-        HashMap<String,CCardInfo> secondCardMap = secondCards.get(secondCards.keySet().toArray()[0]);
-        if (firstCardMap.size() != secondCardMap.size()){
-            result = false;
-            return result;
-        } else {
-            for (String s:firstCardMap.keySet()){
-                if (!secondCardMap.containsKey(s)){
-                    result = false;
-                    return result;
-                }
-            }
-        }
-        return result;
-    }
-
     private void postCardsData(final List<HashMap<Integer,HashMap<String,CCardInfo>>> sendCardList)
     {
-        String url = "http://120.24.173.189:9000";
-        mRequestQueue = Volley.newRequestQueue(this);
-        mStringRequest = new StringRequest(Request.Method.POST,url,new Response.Listener<String>() {
+        String url = "http://120.24.173.189:9000/message/upload/";
+
+        JSONObject params = new JSONObject();
+        try {
+            params.put("param","hello");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,url,new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 Log.v("response",s);
@@ -253,15 +278,16 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
             public void onErrorResponse(VolleyError volleyError) {
                 Log.v("error is ",volleyError.toString());
             }
-        }){
+        })
+        {
+            @Override
             protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
                 String oneTimeData = "[";
 //                Log.i("sendCardLists is ",sendCardList.toString());
                 for (Iterator iterator = sendCardList.iterator();iterator.hasNext();){
-//                    Log.i("sendCard is ",sendCard.toString());
                     HashMap<Integer,HashMap<String,CCardInfo>> sendCard = (HashMap<Integer,HashMap<String,CCardInfo>>)iterator.next();
                     Integer key = (Integer)sendCard.keySet().toArray()[0];
-                    oneTimeData = oneTimeData + "[" +key+","+"31.32"+","+"117.23"
+                    oneTimeData = oneTimeData + "[" +key+","+String.valueOf(latitude)+","+String.valueOf(longitude)
                     +",";
                     HashMap<String,CCardInfo> hashMap = sendCard.get(key);
 
@@ -283,14 +309,25 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
                     }
                 }
                 oneTimeData = oneTimeData + "]";
-//                Log.v("----sendData is ",oneTimeData);
+                Log.v("----sendData is ",oneTimeData);
 
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("data", oneTimeData);
                 return params;
             };
+
+            @Override
+            public Map<String, String> getHeaders() throws com.android.volley.AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+//                headers.put("Content-Type", "application/json; charset=utf-8");
+//                headers.put("User-agent", "My useragent");
+//                return headers;
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", "token NTUzNTA3NWM2M2I4Njk1NDhhNTFkOTE1OzU1MzM5ZTQ4NjNiODY5MmQzNGI5MTMyYTsxMjMxMjMxMjM==");
+                return params;
+            }
         };
-        mRequestQueue.add(mStringRequest);
+        mRequestQueue.add(stringRequest);
     }
 
     //简单找出和上一秒不同的时刻，并把这一秒数据发送到服务端
@@ -320,7 +357,7 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
         } else {
             HashMap<String,CCardInfo> cardMap = new HashMap<String, CCardInfo>();
             cardMap.put(rfid,card);
-            saveCardList.put(timeStandard,cardMap);
+            saveCardList.put(timeStandard, cardMap);
         }
 
         if (saveCardList.size() > 2*TimeInterval){
