@@ -25,7 +25,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.android.volley.Request;
 
-import com.etag.R;
+import com.goatkeeper.R;
 
 import etag.rfid.adapter.ListAdaptet;
 import etag.rfid.bt.AfdBT;
@@ -37,6 +37,9 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -134,7 +137,7 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
     private RequestQueue mRequestQueue;
     private StringRequest mStringRequest;
 
-    public LocationClient mLocationClient = null;
+//    public LocationClient mLocationClient = null;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -146,31 +149,30 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
 		bluetooth = AfdBT.GetAdapter();
 		device = bluetooth.getRemoteDevice(AfdBT.getAddress());
 
-        mLocationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
-//        mLocationClient.registerLocationListener( myListener );    //注册监听函数
-
-        // 设置定位条件
-        LocationClientOption option = new LocationClientOption();
-        option.setOpenGps(true); // 是否打开GPS
-        option.setCoorType("bd09ll"); // 设置返回值的坐标类型。
-
-        // 设置产品线名称。强烈建议您使用自定义的产品线名称，方便我们以后为您提供更高效准确的定位服务。
-        // option.setScanSpan(UPDATE_TIME);// 设置定时定位的时间间隔。单位毫秒
-        mLocationClient.setLocOption(option);
-
-        // 注册位置监听器
-        mLocationClient.registerLocationListener(new BDLocationListener() {
-
-            @Override
-            public void onReceiveLocation(BDLocation location) {
-                // TODO Auto-generated method stub
-                if (location == null) {
-                    return;
-                }
-
-                latitude = location.getLatitude();
-                longitude = location.getLongitude();
-        }});
+//        mLocationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
+//
+//        // 设置定位条件
+//        LocationClientOption option = new LocationClientOption();
+//        option.setOpenGps(true); // 是否打开GPS
+//        option.setCoorType("bd09ll"); // 设置返回值的坐标类型。
+//
+//        // 设置产品线名称。强烈建议您使用自定义的产品线名称，方便我们以后为您提供更高效准确的定位服务。
+//        // option.setScanSpan(UPDATE_TIME);// 设置定时定位的时间间隔。单位毫秒
+//        mLocationClient.setLocOption(option);
+//
+//        // 注册位置监听器
+//        mLocationClient.registerLocationListener(new BDLocationListener() {
+//
+//            @Override
+//            public void onReceiveLocation(BDLocation location) {
+//                // TODO Auto-generated method stub
+//                if (location == null) {
+//                    return;
+//                }
+//
+//                latitude = location.getLatitude();
+//                longitude = location.getLongitude();
+//        }});
 
 		mhandler=new Handler() {
 			boolean t = false;
@@ -200,7 +202,55 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
 		//		ccm.readCard();
 			} 
 		};
-		initView();	
+		initView();
+
+        LocationManager locationManager = (LocationManager)getSystemService(this.LOCATION_SERVICE);
+        if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if(location != null){
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+            }
+        }else{
+            LocationListener locationListener = new LocationListener() {
+
+                // Provider的状态在可用、暂时不可用和无服务三个状态直接切换时触发此函数
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                }
+
+                // Provider被enable时触发此函数，比如GPS被打开
+                @Override
+                public void onProviderEnabled(String provider) {
+
+                }
+
+                // Provider被disable时触发此函数，比如GPS被关闭
+                @Override
+                public void onProviderDisabled(String provider) {
+
+                }
+
+                //当坐标改变时触发此函数，如果Provider传进相同的坐标，它就不会被触发
+                @Override
+                public void onLocationChanged(Location location) {
+                    if (location != null) {
+                        Log.e("Map", "Location changed : Lat: "
+                                + location.getLatitude() + " Lng: "
+                                + location.getLongitude());
+                        latitude = location.getLatitude();
+                        longitude = location.getLongitude();
+                    }
+                }
+            };
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1000, 0,locationListener);
+            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if(location != null){
+                latitude = location.getLatitude(); //经度
+                longitude = location.getLongitude(); //纬度
+            }
+        }
 	}
 	private void finsh()
 	{
@@ -259,12 +309,20 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
         String url = "http://120.24.173.189:9000/message/upload/";
 
         //更新经纬度
-        try {
-            latitude = mLocationClient.getLastKnownLocation().getLatitude();
-            longitude = mLocationClient.getLastKnownLocation().getLongitude();
-        } catch (Exception e){
-            e.printStackTrace();;
-        }
+//        try {
+//            if(location != null){
+//                latitude = location.getLatitude(); //经度
+//                longitude = location.getLongitude(); //纬度
+//            }
+//            if(location != null){
+//                latitude = location.getLatitude(); //经度
+//                longitude = location.getLongitude(); //纬度
+//            }
+//            latitude = mLocationClient.getLastKnownLocation().getLatitude();
+//            longitude = mLocationClient.getLastKnownLocation().getLongitude();
+//        } catch (Exception e){
+//            e.printStackTrace();;
+//        }
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST,url,new Response.Listener<String>() {
             @Override

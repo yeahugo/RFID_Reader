@@ -2,7 +2,7 @@ package etag.rfid.adapter;
 
 import java.util.List;
 
-import com.etag.R;
+import com.goatkeeper.R;
 
 import android.content.Context;
 import android.view.View;
