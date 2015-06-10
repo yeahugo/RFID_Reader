@@ -136,9 +136,6 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
 
     public LocationClient mLocationClient = null;
 
-    private double latitude;
-    private double longitude;
-
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -150,7 +147,7 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
 		device = bluetooth.getRemoteDevice(AfdBT.getAddress());
 
         mLocationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
-        mLocationClient.registerLocationListener( myListener );    //注册监听函数
+//        mLocationClient.registerLocationListener( myListener );    //注册监听函数
 
         // 设置定位条件
         LocationClientOption option = new LocationClientOption();
@@ -261,11 +258,12 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
     {
         String url = "http://120.24.173.189:9000/message/upload/";
 
-        JSONObject params = new JSONObject();
+        //更新经纬度
         try {
-            params.put("param","hello");
-        } catch (JSONException e) {
-            e.printStackTrace();
+            latitude = mLocationClient.getLastKnownLocation().getLatitude();
+            longitude = mLocationClient.getLastKnownLocation().getLongitude();
+        } catch (Exception e){
+            e.printStackTrace();;
         }
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST,url,new Response.Listener<String>() {
