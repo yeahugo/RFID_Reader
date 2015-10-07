@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.goatkeeper"
+    package="com.goatkeeper.scaner"
     android:versionCode="1"
     android:versionName="1.0" >
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import com.goatkeeper.R;
+import com.goatkeeper.scaner.R;
 
 import etag.rfid.bt.AfdBT;
 import android.app.Activity;

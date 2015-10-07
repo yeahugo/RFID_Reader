@@ -1,6 +1,6 @@
 package etag.rfid.ui;
 
-import com.goatkeeper.R;
+import com.goatkeeper.scaner.R;
 
 import etag.rfid.bt.AfdBT;
 import etag.rfid.bt.BluetoothCommService;

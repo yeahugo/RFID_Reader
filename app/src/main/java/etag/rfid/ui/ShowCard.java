@@ -25,7 +25,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.android.volley.Request;
 
-import com.goatkeeper.R;
+import com.goatkeeper.scaner.R;
 
 import etag.rfid.adapter.ListAdaptet;
 import etag.rfid.bt.AfdBT;
@@ -86,7 +86,7 @@ public class ShowCard extends Activity implements IReadCard,OnClickListener{
     private double longitude = 0.0;
 
     private static final int MaxSentListSize = 5;
-    private static final int TimeInterval = 2;
+    private static final int TimeInterval = 5;
 
     // Debugging
     private static final String TAG = "BluetoothComm";
